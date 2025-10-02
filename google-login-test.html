@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Login Test - Global Vip Numbers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4CAF50;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: #3367D6;
+      transform: translateY(-2px);
+    }
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      min-height: 20px;
+    }
+    .success { background: rgba(76, 175, 80, 0.2); color: #4CAF50; border: 1px solid #4CAF50; }
+    .error { background: rgba(244, 67, 54, 0.2); color: #f44336; border: 1px solid #f44336; }
+    .info { background: rgba(33, 150, 243, 0.2); color: #2196F3; border: 1px solid #2196F3; }
+    .troubleshoot { background: rgba(255, 152, 0, 0.2); color: #FF9800; border: 1px solid #FF9800; }
+    .config-display {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      margin: 10px 0;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Google Login Test Page</h1>
+    
+    <div class="test-section">
+      <h3>📋 Firebase Configuration Check</h3>
+      <div id="configStatus" class="status info">Checking Firebase configuration...</div>
+      <div id="configDetails" class="config-display" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>🔐 Google Authentication Test</h3>
+      <button id="testGoogleLogin">🔍 Test Google Login</button>
+      <div id="loginStatus" class="status"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>🛠️ Troubleshooting Tools</h3>
+      <button id="checkDomains">🌐 Check Authorized Domains</button>
+      <button id="showTroubleshoot">📖 Show Troubleshooting Guide</button>
+      <div id="troubleshootStatus" class="status"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>📊 Test Results</h3>
+      <div id="testResults" class="status info">Ready to test...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+    // ✅ Fixed Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgVrQTPsIocnQEUioIEKZgcwMXG1t1tHk",
+      authDomain: "gobal-vip-numbers.firebaseapp.com",
+      projectId: "gobal-vip-numbers",
+      storageBucket: "gobal-vip-numbers.appspot.com", // ✅ FIXED
+      messagingSenderId: "1059192210451",
+      appId: "1:1059192210451:web:21551ac29b84619b0fabe6",
+      measurementId: "G-FMF9QNVQW0"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // DOM elements
+    const configStatus = document.getElementById('configStatus');
+    const configDetails = document.getElementById('configDetails');
+    const loginStatus = document.getElementById('loginStatus');
+    const troubleshootStatus = document.getElementById('troubleshootStatus');
+    const testResults = document.getElementById('testResults');
+
+    // Check Firebase configuration
+    function checkFirebaseConfig() {
+      try {
+        configStatus.innerHTML = '✅ Firebase configuration loaded successfully';
+        configStatus.className = 'status success';
+        
+        configDetails.innerHTML = `
+API Key: ${firebaseConfig.apiKey.substring(0, 20)}...
+Auth Domain: ${firebaseConfig.authDomain}
+Project ID: ${firebaseConfig.projectId}
+        `;
+        configDetails.style.display = 'block';
+        
+        updateTestResults('✅ Firebase configuration: OK');
+      } catch (error) {
+        configStatus.innerHTML = '❌ Firebase configuration error: ' + error.message;
+        configStatus.className = 'status error';
+        updateTestResults('❌ Firebase configuration: FAILED');
+      }
+    }
+
+    // Test Google Login
+    async function testGoogleLogin() {
+      loginStatus.innerHTML = '🔄 Testing Google authentication...';
+      loginStatus.className = 'status info';
+      
+      try {
+        const result = await signInWithPopup(auth, provider);
+        loginStatus.innerHTML = `✅ Success! Logged in as: ${result.user.displayName || result.user.email}`;
+        loginStatus.className = 'status success';
+        updateTestResults('✅ Google Login: SUCCESS');
+      } catch (error) {
+        let errorMessage = '❌ Error: ' + error.message;
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+          errorMessage = '❌ User cancelled the sign-in';
+        } else if (error.code === 'auth/popup-blocked') {
+          errorMessage = '❌ Popup blocked by browser. Please allow popups.';
+        } else if (error.code === 'auth/operation-not-allowed') {
+          errorMessage = '❌ Google sign-in not enabled in Firebase Console';
+        } else if (error.code === 'auth/network-request-failed') {
+          errorMessage = '❌ Network error. Check internet connection.';
+        }
+        
+        loginStatus.innerHTML = errorMessage;
+        loginStatus.className = 'status error';
+        updateTestResults('❌ Google Login: FAILED - ' + error.code);
+      }
+    }
+
+    // Check authorized domains
+    function checkAuthorizedDomains() {
+      const currentDomain = window.location.hostname;
+      const currentOrigin = window.location.origin;
+      
+      troubleshootStatus.innerHTML = `
+🌐 Current domain: ${currentDomain}
+🌐 Current origin: ${currentOrigin}
+
+📋 Make sure these are added to Firebase Console:
+• Go to Firebase Console → Authentication → Settings → Authorized domains
+• Add: ${currentDomain}
+• Add: localhost (for testing)
+• Add: your production domain (if different)
+      `;
+      troubleshootStatus.className = 'status troubleshoot';
+    }
+
+    // Show troubleshooting guide
+    function showTroubleshootingGuide() {
+      const guide = `
+🔹 FIREBASE SETTINGS CHECKLIST:
+1. Go to Firebase Console → Authentication → Sign-in method
+2. Make sure Google is enabled
+3. Add authorized domains:
+   - ${window.location.hostname} (current domain)
+   - localhost (for testing)
+   - your actual domain (if hosted)
+
+🔹 COMMON ERRORS & FIXES:
+• "This app is not authorized" → Add domain to Firebase authorized domains
+• "disallowed_useragent" → Use Chrome/Edge/Safari (not embedded browsers)
+• "popup closed by user" → User cancelled, just retry
+• "403 or OAuth error" → Check Google Cloud Console OAuth settings
+• Blank screen → Check browser console for domain mismatch
+      `;
+      
+      troubleshootStatus.innerHTML = guide;
+      troubleshootStatus.className = 'status troubleshoot';
+    }
+
+    // Update test results
+    function updateTestResults(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      testResults.innerHTML += `<br/>[${timestamp}] ${message}`;
+    }
+
+    // Event listeners
+    document.getElementById('testGoogleLogin').addEventListener('click', testGoogleLogin);
+    document.getElementById('checkDomains').addEventListener('click', checkAuthorizedDomains);
+    document.getElementById('showTroubleshoot').addEventListener('click', showTroubleshootingGuide);
+
+    // Initialize
+    checkFirebaseConfig();
+    updateTestResults('🚀 Test page loaded successfully');
+  </script>
+</body>
+</html>

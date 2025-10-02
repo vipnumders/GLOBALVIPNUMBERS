@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="login-style.css">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Vip Numbers</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <a href="chat bot.html" class="contact-link">contact</a>
+    <link rel="stylesheet" href="chat bot.html">
+    <script src="chatbot.js"></script>
+    <style>
+        /* Add these styles for the filters */
+        .filter-container {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .column-filter {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        
+        /* Modern Button Styles */
+        .filter-button, .export-button, .search-button, .pagination-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .filter-button:hover, .export-button:hover, .search-button:hover, .pagination-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .filter-button:active, .export-button:active, .search-button:active, .pagination-button:active {
+            transform: translateY(0);
+        }
+        
+        .pagination-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .search-filter-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-filter-input {
+            flex-grow: 1;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .pagination-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pagination-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            margin: 0 15px;
+            line-height: 32px;
+            font-size: 14px;
+        }
+        
+        /* Login Section Integration */
+        .login-section {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .login-section .login-container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-section .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-section .logo-section h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-section .logo-section p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .login-section .google-login-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-section .google-login-btn:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .login-section .input-group input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        
+        .login-section .input-group input::placeholder {
+            color: #999;
+        }
+        
+        .login-section .input-group input:focus {
+            border-color: #4CAF50;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .login-section .divider span {
+            background: rgba(255, 255, 255, 0.8);
+            color: #666;
+        }
+        
+        .login-section .divider::before {
+            background: #ddd;
+        }
+        
+        /* Profile Section Integration */
+        .profile-section {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .profile-section .profile-container {
+            max-width: 350px;
+            width: 100%;
+        }
+        
+        .profile-section .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-section .profile-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-section .profile-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        /* Hide main content when not logged in */
+        .main-content {
+            display: none;
+        }
+        
+        .main-content.visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="vi-logo">GVN</div>
+        <h1>Global Vip Numbers</h1>
+        
+        <!-- Login System -->
+        <div id="login-section" class="login-section">
+            <div class="login-container">
+                <div class="login-card">
+                    <!-- Logo/Title Area -->
+                    <div class="logo-section">
+                        <div class="logo">
+                            <span class="logo-icon">⚡</span>
+                        </div>
+                        <h2>Welcome Back</h2>
+                        <p>Sign in to access Global VIP Numbers</p>
+                    </div>
+
+                    <!-- Google Login Button -->
+                    <button id="google-login-btn" class="google-login-btn">
+                        <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <!-- Email/Password Form -->
+                    <form id="email-login-form" class="email-form">
+                        <div class="input-group">
+                            <input type="email" id="email" placeholder="Email address" required>
+                            <span class="input-icon">📧</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="password" placeholder="Password" required>
+                            <span class="input-icon">🔒</span>
+                        </div>
+                        <button type="submit" class="login-btn">
+                            <span class="btn-text">Login</span>
+                            <div class="btn-loader hidden">
+                                <div class="spinner-small"></div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile-circle" style="display: none;">
+            <img id="profile-image-circle" src="" alt="Profile">
+            <span id="profile-initials-circle">U</span>
+        </div>
+        <!-- Profile Dropdown (Hidden by default) -->
+        <div id="profile-dropdown" style="display: none;">
+            <div class="profile-header">
+                <h2 id="profile-name-dropdown">User Name</h2>
+            </div>
+            <div class="profile-actions">
+                <button id="logout-btn-dropdown" class="logout-btn">
+                    <span class="logout-icon">🚪</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <style>
+            #profile-circle {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                cursor: pointer;
+                background-color: #ccc;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            #profile-circle img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            #profile-dropdown {
+                position: absolute;
+                top: 80px;
+                right: 20px;
+                background-color: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                width: 150px;
+            }
+        </style>
+        
+        <!-- Main Content (Hidden until login) -->
+        <div class="main-content" id="main-content" style="display:none;">
+            <div class="search-container">
+                <form action="#" method="get" id="search-form">
+                    <input type="text" class="search-input"
+                    placeholder="Search for cell numbers or calculate (e.g. 7*666)..." name="search" id="search-input">
+                    
+                </form>
+                <!-- Enhanced Number Search Bar -->
+                <div class="enhanced-search-container">
+                    <div class="enhanced-search-title">Advanced Number Search</div>
+                    <div class="enhanced-search-content">
+                        <div class="search-type-container">
+                            <div class="search-type-options">
+                                <label><input type="radio" name="searchType" value="anywhere" checked> Anywhere</label>
+                                <label><input type="radio" name="searchType" value="startsWith"> Starts With</label>
+                                <label><input type="radio" name="searchType" value="endsWith"> Ends With</label>
+                                <label><input type="radio" name="searchType" value="exactMatch"> Exact Match</label>
+                            </div>
+                            <div class="enhanced-search-input-container">
+                                <input type="text" id="enhanced-search-input" class="enhanced-search-input" placeholder="Enter digits to search...">
+                                <button id="enhanced-search-button" class="enhanced-search-button">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <div class="enhanced-search-input-container">
+                                <input type="text" id="exclude-digits-input" class="enhanced-search-input" placeholder="Exclude digits...">
+                                <button id="exclude-digits-button" class="enhanced-search-button">
+                                    <i class="fas fa-search-minus"></i> Exclude
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <style>
+                    .search-form{
+                        display: none;
+                    }
+                    .enhanced-search-input-container {
+                        display: flex;
+                        align-items: center;
+                        margin-top: 10px;
+                    }
+                </style>
+            </div>
+
+            <!-- Optional Bar 1: Specific Digit Search -->
+            <div class="optional-bar" hidden>
+                <div class="optional-bar-title">Search by Specific Digits</div>
+                <div class="optional-bar-content">
+                    <div class="digit-search-container">
+                        <div class="digit-search-label">Include only these digits:</div>
+                        <div class="digit-checkboxes">
+                            <label><input type="checkbox" id="select-all-digits"> Select All</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="0"> 0</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="1"> 1</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="2"> 2</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="3"> 3</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="4"> 4</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="5"> 5</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="6"> 6</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="7"> 7</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="8"> 8</label>
+                            <label><input type="checkbox" class="digit-checkbox" value="9"> 9</label>
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Calculator result display -->
+            <div class="calc-result" id="calc-result">
+                <div id="calculation"></div>
+                <div id="result"></div>
+            </div>
+
+            <!-- Controls for export -->
+            <div class="controls-container" id="controls-container" style="display: none;">
+                <div>
+                    <button class="export-button" id="export-excel">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </button>
+                </div>
+                <div>
+                    <span id="result-count"></span>
+                </div>
+            </div>
+
+            <!-- Search results table -->   
+    
+            <div class="results-table-container" id="results-container" style="display: none;">
+                <!-- Modify your table header section -->
+                <table class="results-table" id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Numbers</th>
+                            <th>
+                                Status
+                                <div class="filter-container">
+                                    <select id="statusFilter" class="column-filter">
+                                        <option value="">All Status</option>
+                                        <option value="ACTIVE">ACTIVE</option>
+                                        <option value="AVAILABLE">AVAILABLE</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <th>
+                                Sum of Numbers
+                                <div class="filter-container">
+                                    <input type="text" id="sumFilter" class="search-filter-input" 
+                                        placeholder="Enter sum (e.g., In Two Digits =42)">
+                                </div>
+                            </th>
+                            <th>
+                                Category Type
+                                <div class="filter-container">
+                                    <select id="categoryFilter" class="column-filter">
+                                        <option value="">All Categories</option>
+                                        <option value="PREPAID">PREPAID</option>
+                                        <option value="POSTPAID">POSTPAID</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <th>
+                                Price
+                                <div class="filter-container">
+                                    <select id="priceRangeFilter" class="column-filter">
+                                        <option value="">All Prices</option>
+                                        <option value="0-1000">₹0 - ₹1,000</option>
+                                        <option value="1000-10000">₹1,000 - ₹10,000</option>
+                                        <option value="10000-100000">₹10,000 - ₹100,000</option>
+                                    </select>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <!-- Results will be populated here via JavaScript -->
+                    </tbody>
+                </table>
+                
+                <!-- Pagination controls -->
+                <div class="pagination-container" id="pagination-container">
+                    <button id="prev-page" class="pagination-button">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div class="pagination-info" id="pagination-info">
+                        Page 1 of 1
+                    </div>
+                    <button id="next-page" class="pagination-button">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End main-content -->
+    
+    <script>
+        // Enhanced search functionality
+document.getElementById('enhanced-search-button').addEventListener('click', function() {
+    performEnhancedSearch();
+});
+
+// Also trigger search on Enter key
+document.getElementById('enhanced-search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        performEnhancedSearch();
+    }
+});
+
+document.getElementById('exclude-digits-button').addEventListener('click', function() {
+    performEnhancedSearch();
+});
+
+// Function to perform enhanced search based on selected options
+function performEnhancedSearch() {
+    const searchDigits = document.getElementById('enhanced-search-input').value.trim();
+    const excludeDigits = document.getElementById('exclude-digits-input').value.trim();
+
+    if (!searchDigits && !excludeDigits) {
+        alert('Please enter digits to search for or exclude.');
+        return;
+    }
+    
+    // Get the selected search type
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    
+    // Filter the cell data based on search type and digits
+    let results = cellData.filter(row => {
+        const cellNumber = row[0] ? row[0].toString() : '';
+        
+        if (excludeDigits) {
+            for (let i = 0; i < excludeDigits.length; i++) {
+                if (cellNumber.includes(excludeDigits[i])) {
+                    return false;
+                }
+            }
+        }
+
+        if (!searchDigits) return true;
+
+        switch(searchType) {
+            case 'startsWith':
+                return cellNumber.startsWith(searchDigits);
+            case 'endsWith':
+                return cellNumber.endsWith(searchDigits);
+            case 'exactMatch':
+                return cellNumber === searchDigits;
+            case 'anywhere':
+            default:
+                return cellNumber.includes(searchDigits);
+        }
+    });
+    
+    // Apply any active filters
+    const filteredResults = applyFilters(results);
+    
+    // Display results
+    document.getElementById('results-container').style.display = 'block';
+    populateTable(filteredResults, searchDigits);
+    
+    // Update the main search input to show what we're searching for
+    let searchTermText = '';
+    if (searchDigits) {
+        searchTermText += `${searchType === 'startsWith' ? 'Starts with' : 
+          searchType === 'endsWith' ? 'Ends with' : 
+          searchType === 'exactMatch' ? 'Exact match' : 
+          'Contains'}: ${searchDigits}`;
+    }
+    if (excludeDigits) {
+        if (searchTermText) searchTermText += ', ';
+        searchTermText += `excluding ${excludeDigits}`;
+    }
+    document.getElementById('search-input').value = searchTermText;
+}
+
+        // Event listener for the "Select All" checkbox
+document.getElementById('select-all-digits').addEventListener('change', function() {
+    const isChecked = this.checked;
+    const digitCheckboxes = document.querySelectorAll('.digit-checkbox');
+    
+    // Set all digit checkboxes to match the "Select All" state
+    digitCheckboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+    });
+});
+
+// Update "Select All" checkbox when individual checkboxes change
+document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const allCheckboxes = document.querySelectorAll('.digit-checkbox');
+        const checkedCheckboxes = document.querySelectorAll('.digit-checkbox:checked');
+        
+        // If all checkboxes are checked, check the "Select All" checkbox
+        // If not all checkboxes are checked, uncheck the "Select All" checkbox
+        document.getElementById('select-all-digits').checked = 
+            allCheckboxes.length === checkedCheckboxes.length;
+    });
+});
+
+      
+        // Pagination variables
+        let currentPage = 1;
+        let resultsPerPage = 20;
+        let currentResults = [];
+
+        // Function to check if input is a mathematical expression
+        function isMathExpression(input) {
+            // Check if the input contains any mathematical operators
+            return /[\+\-\*\/\(\)]/.test(input);
+        }
+
+        // Function to safely evaluate mathematical expressions
+        function evaluateMathExpression(expression) {
+            try {
+                // Using Function constructor to evaluate the expression safely
+                // This is safer than eval() but still needs to be used with caution
+                return new Function('return ' + expression)();
+            } catch (error) {
+                return 'Invalid expression';
+            }
+        }
+
+        // Function to calculate sum of digits in a number
+        function calculateDigitSum(number) {
+            if (!number) return 0;
+            
+            // Remove non-digit characters
+            const digitsOnly = number.toString().replace(/[^0-9]/g, '');
+            
+            // Sum the digits
+            let sum = 0;
+            for (let i = 0; i < digitsOnly.length; i++) {
+                sum += parseInt(digitsOnly.charAt(i), 10);
+            }
+
+            while (sum > 9) {
+                sum = sum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+            }
+            
+            return sum;
+        }
+
+        // Function to apply all filters
+        function applyFilters(results) {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const priceRangeFilter = document.getElementById('priceRangeFilter').value;
+            const sumFilter = document.getElementById('sumFilter').value.trim();
+
+            return results.filter(row => {
+                const status = row[2] || '';
+                const category = row[4] || '';
+                const price = parseFloat(row[5]) || 0;
+                const cellNumber = row[0] || ''; // Use the first column for sum calculation
+                const digitSum = calculateDigitSum(cellNumber);
+
+                const statusMatch = !statusFilter || status === statusFilter;
+                const categoryMatch = !categoryFilter || category === categoryFilter;
+                
+                // Price range filter
+                let priceMatch = true;
+                if (priceRangeFilter) {
+                    const [minPrice, maxPrice] = priceRangeFilter.split('-').map(Number);
+                    priceMatch = price >= minPrice && price <= maxPrice;
+                }
+                
+                // Sum filter
+                let sumMatch = true;
+                if (sumFilter) {
+                    // Check if it's a comparison operator
+                    if (sumFilter.startsWith('>')) {
+                        const compareValue = parseInt(sumFilter.substring(1).trim(), 10);
+                        if (!isNaN(compareValue)) {
+                            sumMatch = digitSum > compareValue;
+                        }
+                    } else if (sumFilter.startsWith('<')) {
+                        const compareValue = parseInt(sumFilter.substring(1).trim(), 10);
+                        if (!isNaN(compareValue)) {
+                            sumMatch = digitSum < compareValue;
+                        }
+                    } else if (sumFilter.startsWith('=')) {
+                        const compareValue = parseInt(sumFilter.substring(1).trim(), 10);
+                        if (!isNaN(compareValue)) {
+                            sumMatch = digitSum === compareValue;
+                        }
+                    } else {
+                        // Direct value match
+                        const compareValue = parseInt(sumFilter, 10);
+                        if (!isNaN(compareValue)) {
+                            sumMatch = digitSum === compareValue;
+                        }
+                    }
+                }
+
+                return statusMatch && categoryMatch && priceMatch && sumMatch;
+            });
+        }
+
+        // Function to search cell data
+        function searchCellData(searchTerm) {
+            if (!searchTerm) return [];
+
+            // Check if it's a math expression
+            if (isMathExpression(searchTerm)) {
+                const result = evaluateMathExpression(searchTerm);
+
+                // Display the calculation result
+                const calcResultDiv = document.getElementById('calc-result');
+                calcResultDiv.style.display = 'block';
+                calcResultDiv.innerHTML = `
+                    <div><strong>Expression:</strong> ${searchTerm}</div>
+                    <div><strong>Result:</strong> ${result}</div>
+                `;
+
+                // Search for the result in the cell data
+                return cellData.filter(row => {
+                    return row.some(cell =>
+                        cell && cell.toString().includes(result.toString())
+                    );
+                });
+            } else {
+                // Hide calculation result for regular searches
+                document.getElementById('calc-result').style.display = 'none';
+
+                // Regular search
+                searchTerm = searchTerm.toLowerCase();
+                return cellData.filter(row => {
+                    return row.some(cell =>
+                        cell && cell.toString().toLowerCase().includes(searchTerm)
+                    );
+                });
+            }
+        }
+
+        // Function to highlight search term in results
+        function highlightText(text, searchTerm) {
+            if (!searchTerm || !text) return text;
+
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.toString().replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Function to get paginated results
+        function getPaginatedResults() {
+            const startIndex = (currentPage - 1) * resultsPerPage;
+            const endIndex = startIndex + resultsPerPage;
+            return currentResults.slice(startIndex, endIndex);
+        }
+
+        // Function to update pagination controls
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(currentResults.length / resultsPerPage);
+            const paginationInfo = document.getElementById('pagination-info');
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+            
+            paginationInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+            
+            prevButton.disabled = currentPage <= 1;
+            nextButton.disabled = currentPage >= totalPages || totalPages === 0;
+            
+            // Show/hide pagination container based on results
+            const paginationContainer = document.getElementById('pagination-container');
+            paginationContainer.style.display = totalPages > 1 ? 'flex' : 'none';
+        }
+
+        // Function to populate the results table
+        function populateTable(results, searchTerm) {
+            const tbody = document.getElementById('results-body');
+            const controlsContainer = document.getElementById('controls-container');
+            const resultCount = document.getElementById('result-count');
+
+            // Store the full results for pagination
+            currentResults = results;
+            
+            // Reset to first page when new search is performed
+            currentPage = 1;
+            
+            tbody.innerHTML = '';
+
+            if (results.length === 0) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.className = 'no-results';
+                noResultsRow.innerHTML = '<td colspan="5">No results found. Try a different search term.</td>';
+                tbody.appendChild(noResultsRow);
+                controlsContainer.style.display = 'none';
+                document.getElementById('pagination-container').style.display = 'none';
+                return;
+            }
+
+            // Show controls and update result count
+            controlsContainer.style.display = 'flex';
+            resultCount.textContent = `Found ${results.length} result${results.length !== 1 ? 's' : ''}`;
+
+            // Get only the results for the current page
+            const paginatedResults = getPaginatedResults();
+
+            paginatedResults.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Calculate the sum of digits for the cell number
+                const cellNumber = row[1] || '';
+                const digitSum = calculateDigitSum(cellNumber);
+
+                // Create cells for each column
+                tr.innerHTML = `
+                    <td>${highlightText(row[0] || '', searchTerm)}</td>
+                    <td>${highlightText(row[2] || '', searchTerm)}</td>
+                    <td>${digitSum}</td>
+                    <td>${highlightText(row[4] || '', searchTerm)}</td>
+                    <td>${highlightText(row[5] || '', searchTerm)}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+            
+            // Update pagination controls
+            updatePaginationControls();
+        }
+
+        // Function to refresh the table with current page
+        function refreshTable(searchTerm) {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+            
+            const paginatedResults = getPaginatedResults();
+            
+            paginatedResults.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Calculate the sum of digits for the cell number
+                const cellNumber = row[1] || '';
+                const digitSum = calculateDigitSum(cellNumber);
+
+                // Create cells for each column
+                tr.innerHTML = `
+                    <td>${highlightText(row[0] || '', searchTerm)}</td>
+                    <td>${highlightText(row[2] || '', searchTerm)}</td>
+                    <td>${digitSum}</td>
+                    <td>${highlightText(row[4] || '', searchTerm)}</td>
+                    <td>${highlightText(row[5] || '', searchTerm)}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+            
+            // Update pagination controls
+            updatePaginationControls();
+        }
+
+        // Event listener for search form
+        document.getElementById('search-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const searchTerm = document.getElementById('search-input').value.trim();
+
+            if (searchTerm) {
+                const results = searchCellData(searchTerm);
+                const filteredResults = applyFilters(results);
+                document.getElementById('results-container').style.display = 'block';
+                populateTable(filteredResults, searchTerm);
+            } else {
+                document.getElementById('results-container').style.display = 'none';
+                document.getElementById('calc-result').style.display = 'none';
+                document.getElementById('controls-container').style.display = 'none';
+            }
+        });
+
+        // Also trigger search on input change for real-time results
+        document.getElementById('search-input').addEventListener('input', function () {
+            const searchTerm = this.value.trim();
+
+            if (searchTerm) {
+                const results = searchCellData(searchTerm);
+                const filteredResults = applyFilters(results);
+                document.getElementById('results-container').style.display = 'block';
+                populateTable(filteredResults, searchTerm);
+            } else {
+                document.getElementById('results-container').style.display = 'none';
+                document.getElementById('calc-result').style.display = 'none';
+                document.getElementById('controls-container').style.display = 'none';
+            }
+        });
+
+        // Event listener for Excel export button
+        document.getElementById('export-excel').addEventListener('click', function () {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            if (searchTerm) {
+                const results = searchCellData(searchTerm);
+                const filteredResults = applyFilters(results);
+                if (filteredResults.length > 0) {
+                    exportToExcel(filteredResults);
+                }
+            }
+        });
+
+        // Function to export to Excel
+        function exportToExcel(data) {
+            // Create a worksheet with the updated column headers
+            const ws = XLSX.utils.aoa_to_sheet([
+                ['Number', 'Status', 'Sum of Numbers', 'Category Type', 'Price'],
+                ...data.map(row => {
+                    // Create a new row with the sum of digits
+                    const cellNumber = row[1] || '';
+                    const digitSum = calculateDigitSum(cellNumber);
+                    return [
+                        row[0], row[2], digitSum, row[4], row[5]
+                    ];
+                })
+            ]);
+
+            // Create a workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Search Results');
+
+            // Generate file and trigger download
+            XLSX.writeFile(wb, 'VI_Number_Search_Results.xlsx');
+        }
+
+        // Function to filter numbers by specific digits
+        function filterByDigits(includeDigits) {
+            if (!includeDigits || includeDigits.length === 0) return [];
+
+            // Create a regex pattern that only allows the specified digits
+            const allowedDigitsStr = includeDigits.join('');
+            const disallowedDigitsStr = '0123456789'.split('').filter(d => !includeDigits.includes(d)).join('');
+            
+            return cellData.filter(row => {
+                // Check the first two columns (Serial ID and Cell Number) for matching the pattern
+                const cellNumber = row[0] ? row[0].toString() : '';
+                const formattedNumber = row[1] ? row[1].toString().replace(/[^0-9]/g, '') : '';
+                
+                // Check if the number contains ONLY the allowed digits
+                const containsOnlyAllowedDigits = 
+                    (cellNumber && !new RegExp(`[${disallowedDigitsStr}]`).test(cellNumber)) ||
+                    (formattedNumber && !new RegExp(`[${disallowedDigitsStr}]`).test(formattedNumber));
+                
+                // Also check if it contains at least one of the allowed digits
+                const containsAllowedDigit = 
+                    (cellNumber && new RegExp(`[${allowedDigitsStr}]`).test(cellNumber)) ||
+                    (formattedNumber && new RegExp(`[${allowedDigitsStr}]`).test(formattedNumber));
+                
+                return containsOnlyAllowedDigits && containsAllowedDigit;
+            });
+        }
+
+        // Auto-apply digit filter when checkboxes change
+        document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkedDigits = Array.from(document.querySelectorAll('.digit-checkbox:checked'))
+                    .map(checkbox => checkbox.value);
+                
+                if (checkedDigits.length > 0) {
+                    const results = filterByDigits(checkedDigits);
+                    const filteredResults = applyFilters(results);
+                    document.getElementById('results-container').style.display = 'block';
+                    populateTable(filteredResults, '');
+                    
+                    // Update the search input to show what we're filtering for
+                    document.getElementById('search-input').value = `Filter: Only digits ${checkedDigits.join(',')}`;
+                } else {
+                    // If no digits selected, show all results
+                    const searchTerm = document.getElementById('search-input').value.trim();
+                    if (searchTerm) {
+                        const results = searchCellData(searchTerm);
+                        const filteredResults = applyFilters(results);
+                        populateTable(filteredResults, searchTerm);
+                    }
+                }
+            });
+        });
+
+        // Auto-apply status filter when selection changes
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            let results = [];
+            
+            if (searchTerm) {
+                results = searchCellData(searchTerm);
+            } else {
+                results = [...cellData]; // Use all data if no search term
+                document.getElementById('results-container').style.display = 'block';
+            }
+
+            const filteredResults = applyFilters(results);
+            populateTable(filteredResults, searchTerm);
+        });
+
+        // Auto-apply category filter when selection changes
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            let results = [];
+            
+            if (searchTerm) {
+                results = searchCellData(searchTerm);
+            } else {
+                results = [...cellData]; // Use all data if no search term
+                document.getElementById('results-container').style.display = 'block';
+            }
+
+            const filteredResults = applyFilters(results);
+            populateTable(filteredResults, searchTerm);
+        });
+
+        // Auto-apply price filter when selection changes
+        document.getElementById('priceRangeFilter').addEventListener('change', function() {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            let results = [];
+            
+            if (searchTerm) {
+                results = searchCellData(searchTerm);
+            } else {
+                results = [...cellData]; // Use all data if no search term
+                document.getElementById('results-container').style.display = 'block';
+            }
+
+            const filteredResults = applyFilters(results);
+            populateTable(filteredResults, searchTerm);
+        });
+
+        // Auto-apply sum filter when input changes
+        document.getElementById('sumFilter').addEventListener('input', function() {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            let results = [];
+            
+            if (searchTerm) {
+                results = searchCellData(searchTerm);
+            } else {
+                results = [...cellData]; // Use all data if no search term
+                document.getElementById('results-container').style.display = 'block';
+            }
+
+            const filteredResults = applyFilters(results);
+            populateTable(filteredResults, searchTerm);
+        });
+
+        // Also allow pressing Enter in the sum filter input
+        document.getElementById('sumFilter').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('apply-sum-filter').click();
+            }
+        });
+
+        // Event listeners for pagination buttons
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                const searchTerm = document.getElementById('search-input').value.trim();
+                refreshTable(searchTerm);
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', function() {
+            const totalPages = Math.ceil(currentResults.length / resultsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                const searchTerm = document.getElementById('search-input').value.trim();
+                refreshTable(searchTerm);
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+     <script src="number.js"></script>
+    <!-- Firebase Google Authentication + Firestore -->
+    <script>
+      // Your Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAgVrQTPsIocnQEUioIEKZgcwMXG1t1tHk",
+        authDomain: "gobal-vip-numbers.firebaseapp.com",
+        projectId: "gobal-vip-numbers",
+        storageBucket: "gobal-vip-numbers.appspot.com",
+        messagingSenderId: "1059192210451",
+        appId: "1:1059192210451:web:21551ac29b84619b0fabe6",
+        measurementId: "G-FMF9QNVQW0"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const provider = new firebase.auth.GoogleAuthProvider();
+    </script>
+    
+    <!-- Login System Script -->
+    <script src="login-script.js"></script>
+    
+    <script>
+        // Integration script for login system
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize login system
+            initializeLoginSystem();
+        });
+        
+        function initializeLoginSystem() {
+            // Show login section by default
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('profile-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+        }
+        
+        // Override the login functions to show main content
+        function showMainContent() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('profile-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'block';
+        }
+        
+        function hideMainContent() {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('profile-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+        }
+        
+        // Override the original login functions
+        const originalShowProfileScreen = window.showProfileScreen;
+        const originalShowLoginScreen = window.showLoginScreen;
+        
+        if (originalShowProfileScreen) {
+            window.showProfileScreen = function() {
+                originalShowProfileScreen();
+                showMainContent();
+            };
+        }
+        
+        if (originalShowLoginScreen) {
+            window.showLoginScreen = function() {
+                originalShowLoginScreen();
+                hideMainContent();
+            };
+        }
+    </script>
+
+</body> 
+</html>

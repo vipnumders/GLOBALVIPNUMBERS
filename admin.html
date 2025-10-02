@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Panel</h1>
+    <div id="admin-status">Checking access...</div>
+    <div id="admin-content" style="display:none;">
+      <p>Welcome, Admin.</p>
+      <button id="logout-admin">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgVrQTPsIocnQEUioIEKZgcwMXG1t1tHk",
+      authDomain: "gobal-vip-numbers.firebaseapp.com",
+      projectId: "gobal-vip-numbers",
+      storageBucket: "gobal-vip-numbers.firebasestorage.app",
+      messagingSenderId: "1059192210451",
+      appId: "1:1059192210451:web:04be185c6c9a05ea0fabe6",
+      measurementId: "G-9E93WE7VD2"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+
+    const ADMIN_EMAILS = ['admin@example.com'];
+
+    auth.onAuthStateChanged(user => {
+      const status = document.getElementById('admin-status');
+      const content = document.getElementById('admin-content');
+      if (!user) {
+        status.textContent = 'Not signed in. Redirecting to login...';
+        setTimeout(() => window.location.href = 'index.html', 1200);
+        return;
+      }
+      const isAdmin = ADMIN_EMAILS.includes((user.email || '').toLowerCase());
+      if (!isAdmin) {
+        status.textContent = 'Access denied. Redirecting...';
+        setTimeout(() => window.location.href = 'index.html', 1200);
+        return;
+      }
+      status.style.display = 'none';
+      content.style.display = 'block';
+    });
+
+    document.getElementById('logout-admin').addEventListener('click', async () => {
+      try {
+        await auth.signOut();
+        window.location.href = 'index.html';
+      } catch (e) {
+        alert('Logout failed');
+      }
+    });
+  </script>
+</body>
+</html>
+
