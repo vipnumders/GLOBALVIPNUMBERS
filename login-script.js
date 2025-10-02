@@ -363,9 +363,14 @@ if ('ontouchstart' in window) {
 }
 
 profileCircle.addEventListener('click', () => {
-    if (profileDropdown.style.display === 'none') {
-        profileDropdown.style.display = 'block';
-    } else {
+    const isHidden = profileDropdown.style.display === 'none' || !profileDropdown.style.display;
+    profileDropdown.style.display = isHidden ? 'block' : 'none';
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (event) => {
+    // If the click is outside the profile circle and the dropdown itself
+    if (!profileCircle.contains(event.target) && !profileDropdown.contains(event.target)) {
         profileDropdown.style.display = 'none';
     }
 });
