@@ -2,6 +2,7 @@
 <html lang="en">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="login-style.css">
+<link rel="stylesheet" href="chatbot.css">
 <head>
     
     <meta charset="UTF-8">
@@ -17,10 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
-    <a href="chat bot.html" class="contact-link">contact</a>
-    <link rel="stylesheet" href="chat bot.html">
-    <script src="chatbot.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>    
     <style>
         /* Add these styles for the filters */
         .filter-container {
@@ -259,11 +257,13 @@
                     <!-- Email/Password Form -->
                     <form id="email-login-form" class="email-form">
                         <div class="input-group">
-                            <input type="email" id="email" placeholder="Email address" required>
+                            <input type="email" id="email" required placeholder=" ">
+                            <label for="email">Email Address</label>
                             <span class="input-icon">📧</span>
                         </div>
                         <div class="input-group">
-                            <input type="password" id="password" placeholder="Password" required>
+                            <input type="password" id="password" required placeholder=" ">
+                            <label for="password">Password</label>
                             <span class="input-icon">🔒</span>
                         </div>
                         <button type="submit" class="login-btn">
@@ -294,41 +294,6 @@
             </div>
         </div>
 
-        <style>
-            #profile-circle {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                cursor: pointer;
-                background-color: #ccc;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                overflow: hidden;
-            }
-
-            #profile-circle img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            #profile-dropdown {
-                position: absolute;
-                top: 80px;
-                right: 20px;
-                background-color: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                padding: 10px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                width: 150px;
-            }
-        </style>
-        
         <!-- Main Content (Hidden until login) -->
         <div class="main-content" id="main-content" style="display:none;">
             <div class="search-container">
@@ -407,8 +372,8 @@
                 <div id="result"></div>
             </div>
 
-    
-   <!-- Controls for export -->
+   
+        <!-- Controls for export -->
         <div class="controls-container" id="controls-container" style="display: none;">
             <div>
                
@@ -417,6 +382,7 @@
                 <span id="result-count"></span>
             </div>
         </div>
+                 
        
 
             <!-- Search results table -->   
@@ -488,6 +454,22 @@
         </div>
     </div> <!-- End main-content -->
     
+    <!-- Chatbot Container -->
+    <div id="chatbot-container">
+        <div id="chatbot-icon">
+            <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp Chat">
+        </div>
+        <div id="chatbot-window" class="hidden">
+            <div id="chatbot-header">
+                <h3>Contact Us</h3>
+            </div>
+            <div id="chatbot-body">
+                <p>Click on a number to contact us on WhatsApp:</p>
+                <button class="contact-button" data-number="9975130000">9975130000</button>
+                <button class="contact-button" data-number="9975518888">9975518888</button>
+            </div>
+        </div>
+    </div>
     <script>
         // Enhanced search functionality
 document.getElementById('enhanced-search-button').addEventListener('click', function() {
@@ -1053,6 +1035,28 @@ document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
                 refreshTable(searchTerm);
             }
         });
+
+        // Chatbot functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotIcon = document.getElementById('chatbot-icon');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const contactButtons = document.querySelectorAll('.contact-button');
+
+            if (chatbotIcon) {
+                chatbotIcon.addEventListener('click', () => {
+                    chatbotWindow.classList.toggle('hidden');
+                });
+            }
+
+            contactButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const number = button.getAttribute('data-number');
+                    if (number) {
+                        window.open(`https://wa.me/${number}`, '_blank');
+                    }
+                });
+            });
+        });
     </script>
     <script src="script.js"></script>
      <script src="number.js"></script>
@@ -1127,10 +1131,3 @@ document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
 </body> 
 
 </html>
-
-
-
-
-
-
-
