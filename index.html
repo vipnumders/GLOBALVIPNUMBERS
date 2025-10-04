@@ -107,6 +107,30 @@
             line-height: 32px;
             font-size: 14px;
         }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+        }
+
+        .page-number-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 0 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .page-number-button:hover {
+            background-color: #45a049;
+        }
+
+        .page-number-button.active {
+            background-color: #357a38;
+        }
         
         /* Login Section Integration */
         .login-section {
@@ -215,6 +239,11 @@
         
         .main-content.visible {
             display: block;
+        }
+
+        #result-count {
+            color: white;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -376,7 +405,7 @@
         <!-- Controls for export -->
         <div class="controls-container" id="controls-container" style="display: none;">
             <div>
-               
+                <!-- Hide Results button removed as per user request -->
             </div>
             <div>
                 <span id="result-count"></span>
@@ -443,8 +472,8 @@
                     <button id="prev-page" class="pagination-button">
                         <i class="fas fa-chevron-left"></i> Previous
                     </button>
-                    <div class="pagination-info" id="pagination-info">
-                        Page 1 of 1
+                    <div id="page-numbers" class="page-numbers">
+                        <!-- Page number buttons will be added here -->
                     </div>
                     <button id="next-page" class="pagination-button">
                         Next <i class="fas fa-chevron-right"></i>
@@ -465,7 +494,7 @@
             </div>
             <div id="chatbot-body">
                 <p>Click on a number to contact us on WhatsApp:</p>
-                <button class="contact-button" data-number="9975130000">9975130000</button>
+                <button class="contact-button" data-number="9168480110+">9168480110</button>
                 <button class="contact-button" data-number="9975518888">9975518888</button>
             </div>
         </div>
@@ -727,15 +756,40 @@ document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
         // Function to update pagination controls
         function updatePaginationControls() {
             const totalPages = Math.ceil(currentResults.length / resultsPerPage);
-            const paginationInfo = document.getElementById('pagination-info');
             const prevButton = document.getElementById('prev-page');
             const nextButton = document.getElementById('next-page');
-            
-            paginationInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
-            
+            const pageNumbersDiv = document.getElementById('page-numbers');
+
+            // Clear existing page numbers
+            pageNumbersDiv.innerHTML = '';
+
+            // Generate page number buttons
+            const maxVisiblePages = 5; // Show up to 5 page numbers
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = 'page-number-button';
+                pageButton.textContent = i;
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    const searchTerm = document.getElementById('search-input').value.trim();
+                    refreshTable(searchTerm);
+                });
+                pageNumbersDiv.appendChild(pageButton);
+            }
+
             prevButton.disabled = currentPage <= 1;
             nextButton.disabled = currentPage >= totalPages || totalPages === 0;
-            
+
             // Show/hide pagination container based on results
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.style.display = totalPages > 1 ? 'flex' : 'none';
@@ -1036,29 +1090,10 @@ document.querySelectorAll('.digit-checkbox').forEach(checkbox => {
             }
         });
 
-        // Chatbot functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatbotIcon = document.getElementById('chatbot-icon');
-            const chatbotWindow = document.getElementById('chatbot-window');
-            const contactButtons = document.querySelectorAll('.contact-button');
 
-            if (chatbotIcon) {
-                chatbotIcon.addEventListener('click', () => {
-                    chatbotWindow.classList.toggle('hidden');
-                });
-            }
-
-            contactButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const number = button.getAttribute('data-number');
-                    if (number) {
-                        window.open(`https://wa.me/${number}`, '_blank');
-                    }
-                });
-            });
-        });
     </script>
     <script src="script.js"></script>
+    <script src="contact.js"></script>
      <script src="number.js"></script>
     <!-- Firebase Google Authentication + Firestore -->
     <script>
